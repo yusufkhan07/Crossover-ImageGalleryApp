@@ -47,8 +47,20 @@ export class ImageUploadFormComponent implements OnInit {
   };
 
   validateFile = (file?: File): boolean => {
-    let valid: boolean = true;
+    // validate files only if file exist
+    if (!file) {
+      return true;
+    }
 
-    return valid;
+    // Allow files < 500 KB & PNG or JPEG types.
+
+    if (
+      Math.round(file.size / 1024) > 500 ||
+      (file.type !== 'image/jpeg' && file.type !== 'image/png')
+    ) {
+      return false;
+    }
+
+    return true;
   };
 }
