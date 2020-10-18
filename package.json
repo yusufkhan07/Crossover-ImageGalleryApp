@@ -1,0 +1,9 @@
+{
+  "name": "image-search",
+  "version": "1.0.0",
+  "description": "Web app to Upload and search images",
+  "scripts": { },
+  "author": "Yousuf Khan (yusufkhanjee@gmail.com)",
+  "private": true,
+  "license": "UNLICENSED"
+}
