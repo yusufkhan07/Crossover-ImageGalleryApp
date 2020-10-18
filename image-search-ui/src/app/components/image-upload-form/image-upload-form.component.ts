@@ -6,6 +6,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./image-upload-form.component.scss'],
 })
 export class ImageUploadFormComponent implements OnInit {
+  file: File;
+  description: string;
+
   constructor() {}
 
   ngOnInit(): void {}
@@ -16,6 +19,7 @@ export class ImageUploadFormComponent implements OnInit {
     const isValid = this.validateFile(file);
 
     if (isValid) {
+      this.file = file;
       console.log('valid file');
     } else {
       console.log('invalid file');
@@ -24,6 +28,8 @@ export class ImageUploadFormComponent implements OnInit {
 
   handleSubmit = () => {
     console.log('form submitted');
+    console.log(this.file);
+    console.log(this.description);
   };
 
   validateFile = (file?: File): boolean => {
