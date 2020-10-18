@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-image-upload-form',
@@ -6,10 +7,13 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./image-upload-form.component.scss'],
 })
 export class ImageUploadFormComponent implements OnInit {
-  file: File;
-  description: string;
+  private readonly formUrl = '';
 
-  constructor() {}
+  public file: File;
+  public description: string;
+  public status: string;
+
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {}
 
@@ -27,9 +31,19 @@ export class ImageUploadFormComponent implements OnInit {
   };
 
   handleSubmit = () => {
-    console.log('form submitted');
-    console.log(this.file);
-    console.log(this.description);
+    this.http
+      .post<unknown>(this.formUrl, {
+        file: this.file,
+        description: this.description,
+      })
+      .subscribe(
+        (val) => {
+          this.status = 'Submitted Successfully';
+        },
+        (err) => {
+          this.status = 'Submission Error';
+        }
+      );
   };
 
   validateFile = (file?: File): boolean => {
