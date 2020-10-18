@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Sequelize } from 'sequelize-typescript';
+import * as aws from 'aws-sdk';
 
 import { PhotosService } from './photos.service';
 import { Photo } from './models/photo.model';
@@ -27,6 +28,12 @@ describe('PhotosService', () => {
         {
           provide: `PhotoRepository`,
           useValue: sequelize.model(Photo.getTableName() as string),
+        },
+        {
+          provide: `aws`,
+          useFactory: async () => {
+            return aws;
+          },
         },
         PhotosService,
       ],
