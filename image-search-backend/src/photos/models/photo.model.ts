@@ -1,14 +1,35 @@
-import { Column, Model, Table, PrimaryKey } from 'sequelize-typescript';
+import {
+  Column,
+  Model,
+  Table,
+  PrimaryKey,
+  UpdatedAt,
+  CreatedAt,
+  AllowNull,
+  AutoIncrement,
+} from 'sequelize-typescript';
 
-@Table
+@Table({
+  tableName: 'photos',
+  modelName: 'photos',
+})
 export class Photo extends Model<Photo> {
+  @AutoIncrement
   @PrimaryKey
   @Column
-  id: string;
+  id: number;
 
+  @CreatedAt
+  createdAt: Date;
+
+  @UpdatedAt
+  updatedAt: Date;
+
+  @AllowNull(false)
   @Column
   description: string;
 
+  @AllowNull(false)
   @Column
   s3Key: string;
 }
