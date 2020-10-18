@@ -1,5 +1,5 @@
 <div>
-  <app-image-upload></app-image-upload>
+  <app-image-upload [onChange]="handleFileChange"></app-image-upload>
 
   <div>
     <span>Description</span>
@@ -8,6 +8,6 @@
 
   <div>
     <span>Submit</span>
-    <button type="submit">Upload</button>
+    <button type="submit" (click)="handleSubmit()">Upload</button>
   </div>
 </div>
