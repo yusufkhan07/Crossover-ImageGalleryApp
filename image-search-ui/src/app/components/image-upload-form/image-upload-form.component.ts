@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./image-upload-form.component.scss'],
 })
 export class ImageUploadFormComponent implements OnInit {
-  private readonly formUrl = '';
+  private readonly formUrl = 'http://localhost:3000/photos';
 
   public file: File;
   public description: string;
@@ -31,19 +31,18 @@ export class ImageUploadFormComponent implements OnInit {
   };
 
   handleSubmit = () => {
-    this.http
-      .post<unknown>(this.formUrl, {
-        file: this.file,
-        description: this.description,
-      })
-      .subscribe(
-        (val) => {
-          this.status = 'Submitted Successfully';
-        },
-        (err) => {
-          this.status = 'Submission Error';
-        }
-      );
+    const formData = new FormData();
+
+    formData.append('photo', this.file, this.file.name);
+
+    this.http.post<unknown>(this.formUrl, formData).subscribe(
+      (val) => {
+        this.status = 'Submitted Successfully';
+      },
+      (err) => {
+        this.status = 'Submission Error';
+      }
+    );
   };
 
   validateFile = (file?: File): boolean => {
