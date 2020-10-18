@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -9,6 +10,7 @@ import { Photo } from './photos/models/photo.model';
 @Module({
   imports: [
     PhotosModule,
+    ConfigModule.forRoot(),
     SequelizeModule.forRoot({
       database: 'some_db',
       dialect: 'sqlite',
