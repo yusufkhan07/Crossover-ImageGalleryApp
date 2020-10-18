@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Sequelize } from 'sequelize-typescript';
+import * as AWSMock from 'aws-sdk-mock';
 import * as aws from 'aws-sdk';
 
 import { PhotosService } from './photos.service';
@@ -32,6 +33,25 @@ describe('PhotosService', () => {
         {
           provide: `aws`,
           useFactory: async () => {
+            AWSMock.setSDKInstance(aws);
+
+            // mock S3.upload method
+            AWSMock.mock(
+              'S3',
+              'upload',
+              (
+                params: aws.S3.PutObjectRequest,
+                callback: (err, data: aws.S3.ManagedUpload.SendData) => unknown,
+              ) => {
+                callback(null, {
+                  Location: 'some-location',
+                  ETag: 'd41d8cd98f00b204e9800991ecf8427e',
+                  Key: params.Key,
+                  Bucket: params.Bucket,
+                });
+              },
+            );
+
             return aws;
           },
         },
