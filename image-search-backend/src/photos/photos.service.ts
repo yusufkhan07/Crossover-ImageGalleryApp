@@ -9,6 +9,7 @@ import * as aws from 'aws-sdk';
 const { v4: uuid } = require('uuid');
 
 import { Photo } from './models/photo.model';
+import { PhotoDto } from './dto/photo.dto';
 
 export const err_messages = {
   invalid_file_size: `file size should be less than 500kb`,
@@ -52,7 +53,7 @@ export class PhotosService {
       size: number;
     };
     description: string;
-  }): Promise<Photo> {
+  }): Promise<PhotoDto> {
     if (photo.file.size / 1024 > 500) {
       throw new BadRequestException(err_messages.invalid_file_size);
     }
