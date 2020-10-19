@@ -4,6 +4,7 @@ import {
   BadRequestException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/sequelize';
 import * as aws from 'aws-sdk';
 const { v4: uuid } = require('uuid');
@@ -20,6 +21,7 @@ export const err_messages = {
 @Injectable()
 export class PhotosService {
   constructor(
+    private readonly configService: ConfigService,
     @InjectModel(Photo)
     private readonly photoModel: typeof Photo,
     @Inject(`aws`)
@@ -30,14 +32,14 @@ export class PhotosService {
     return this.photoModel.count();
   }
 
-  private async uploadToS3(file) {
+  private async uploadToS3(file: { Key: string; Body: aws.S3.Body }) {
     const s3 = new this._aws.S3();
 
     const upload = await s3
       .upload({
-        Bucket: '',
+        Bucket: this.configService.get<string>('AWS_IMAGES_BUCKET'),
         Key: file.Key,
-        Body: Buffer.from([]),
+        Body: file.Body,
       })
       .promise();
 
@@ -75,6 +77,7 @@ export class PhotosService {
     try {
       await this.uploadToS3({
         Key: s3Key,
+        Body: photo.file.buffer,
       });
     } catch (err) {
       await created.destroy();
