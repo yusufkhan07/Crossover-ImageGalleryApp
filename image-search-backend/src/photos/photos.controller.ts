@@ -4,15 +4,17 @@ import {
   UseInterceptors,
   UploadedFile,
   Body,
+  ValidationPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { IsString } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 import { PhotosService } from './photos.service';
-import { Photo } from './models/photo.model';
 import { PhotoDto } from './dto/photo.dto';
 
 class PostPostDto {
+  @IsNotEmpty()
   @IsString()
   description: string;
 }
@@ -24,9 +26,16 @@ export class PhotosController {
   @Post('')
   @UseInterceptors(FileInterceptor('photo'))
   create(
-    @UploadedFile('photo') file,
-    @Body() dto: PostPostDto,
+    @UploadedFile() file,
+    @Body(ValidationPipe) dto: PostPostDto,
   ): Promise<PhotoDto> {
-    return this.photosService.create({} as any);
+    if (!file) {
+      throw new BadRequestException(`file is required`);
+    }
+
+    return this.photosService.create({
+      file,
+      description: dto.description,
+    } as any);
   }
 }
