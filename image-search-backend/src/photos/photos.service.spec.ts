@@ -1,5 +1,6 @@
 import { Test, TestingModuleBuilder } from '@nestjs/testing';
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
+import { ConfigService } from '@nestjs/config';
 import * as AWSMock from 'aws-sdk-mock';
 import * as aws from 'aws-sdk';
 
@@ -70,6 +71,7 @@ describe('PhotosService', () => {
             return aws;
           },
         },
+        ConfigService,
         PhotosService,
       ],
     });
@@ -182,6 +184,11 @@ describe('PhotosService', () => {
     expect(dbPhotosCountEnd).toEqual(dbPhotosCountStart + 1);
     expect(Object.keys(s3Storage).length).toEqual(s3ObjectsCount + 1);
   });
+
+  // describe('list', () => {
+  //   it('should return all files from db', async () => {
+  //   });
+  // });
 });
 
 describe('PhotosServiceWithFailingS3', () => {
@@ -221,6 +228,7 @@ describe('PhotosServiceWithFailingS3', () => {
           },
         },
         PhotosService,
+        ConfigService,
       ],
     }).compile();
 
@@ -302,6 +310,7 @@ describe('PhotosServiceWithFailingPhotoRepositoryCreateMethod', () => {
             return aws;
           },
         },
+        ConfigService,
         PhotosService,
       ],
     }).compile();
