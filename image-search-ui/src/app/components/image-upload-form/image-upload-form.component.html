@@ -1,17 +1,27 @@
-<form (ngSubmit)="handleSubmit()">
-  <app-image-upload [onChange]="handleFileChange"></app-image-upload>
+<div class="container">
+  <h1 class="title">Upload Image</h1>
+  <form (ngSubmit)="handleSubmit()">
+    <app-image-upload [onChange]="handleFileChange"></app-image-upload>
 
-  <div>
-    <span>Description</span>
-    <input type="text" name="description" [(ngModel)]="description" />
-  </div>
+    <div class="field">
+      <label class="label">Description</label>
+      <div class="control">
+        <input
+          class="input"
+          type="text"
+          name="description"
+          [(ngModel)]="description"
+          placeholder=""
+        />
+      </div>
+    </div>
 
-  <div>
-    <p>{{ status }}</p>
-  </div>
+    <div>
+      <p>{{ status }}</p>
+    </div>
 
-  <div>
-    <span>Submit</span>
-    <input type="submit" />
-  </div>
-</form>
+    <div class="control">
+      <button class="button is-primary" type="submit">Submit</button>
+    </div>
+  </form>
+</div>
