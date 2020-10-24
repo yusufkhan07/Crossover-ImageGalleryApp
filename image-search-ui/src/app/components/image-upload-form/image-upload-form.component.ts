@@ -34,6 +34,7 @@ export class ImageUploadFormComponent implements OnInit {
     const formData = new FormData();
 
     formData.append('photo', this.file, this.file.name);
+    formData.append('description', this.description)
 
     this.http.post<unknown>(this.formUrl, formData).subscribe(
       (val) => {
