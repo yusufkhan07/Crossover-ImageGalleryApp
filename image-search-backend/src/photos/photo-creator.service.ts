@@ -42,16 +42,7 @@ export class PhotoCreatorService {
     return upload;
   }
 
-  // inserts record in RDS and upload image to s3.
-  async create(photo: {
-    file: {
-      originalname: string;
-      mimetype: string;
-      buffer;
-      size: number;
-    };
-    description: string;
-  }): Promise<PhotoDto> {
+  private validate(photo) {
     if (photo.file.size / 1024 > 500) {
       throw new BadRequestException(err_messages.invalid_file_size);
     }
@@ -62,6 +53,18 @@ export class PhotoCreatorService {
     ) {
       throw new BadRequestException(err_messages.invalid_file_type);
     }
+  }
+
+  async create(photo: {
+    file: {
+      originalname: string;
+      mimetype: string;
+      buffer;
+      size: number;
+    };
+    description: string;
+  }): Promise<PhotoDto> {
+    this.validate(photo);
 
     const s3Key: string = uuid();
 
