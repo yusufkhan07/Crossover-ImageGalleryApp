@@ -9,51 +9,60 @@ import { HttpClient } from '@angular/common/http';
 export class ImageUploadFormComponent implements OnInit {
   private readonly formUrl = 'http://localhost:3000/photos';
 
-  public file: File;
-  public description: string;
-  public status: string;
+  file: File;
+
+  description: string;
+
+  formSubmissionStatus: boolean;
+  formSubmissionStatusText: string;
+
+  private get valid(): boolean {
+    return (
+      this.validateFile(this.file) && this.validateDescription(this.description)
+    );
+  }
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {}
 
-  handleFileChange = (files: FileList) => {
-    const file = files[0];
-
-    const isValid = this.validateFile(file);
-
-    if (isValid) {
-      this.file = file;
-      console.log('valid file');
-    } else {
-      console.log('invalid file');
-    }
+  handleFileChange = (file: File) => {
+    this.file = file;
   };
 
-  handleSubmit = () => {
+  handleDescriptionChange = (description: string) => {};
+
+  handleSubmit = (form) => {
+    // if (!this.valid) {
+    //   return alert(`form is not valid`);
+    // }
+    this.formSubmissionStatusText = undefined;
+
     const formData = new FormData();
 
-    formData.append('photo', this.file, this.file.name);
-    formData.append('description', this.description)
+    if (this.file) {
+      formData.append('photo', this.file, this.file.name);
+    }
+    formData.append('description', this.description);
 
     this.http.post<unknown>(this.formUrl, formData).subscribe(
       (val) => {
-        this.status = 'Submitted Successfully';
+        this.formSubmissionStatusText = 'Success';
+        this.formSubmissionStatus = true;
       },
       (err) => {
-        this.status = 'Submission Error';
+        this.formSubmissionStatusText = 'Failed';
+        this.formSubmissionStatus = false;
       }
     );
   };
 
-  validateFile = (file?: File): boolean => {
-    // validate files only if file exist
-    if (!file) {
-      return true;
+  validateFile = (file: File): boolean => {
+    if (file == null) {
+      return false;
     }
 
     // Allow files < 500 KB & PNG or JPEG types.
-
     if (
       Math.round(file.size / 1024) > 500 ||
       (file.type !== 'image/jpeg' && file.type !== 'image/png')
@@ -62,5 +71,9 @@ export class ImageUploadFormComponent implements OnInit {
     }
 
     return true;
+  };
+
+  validateDescription = (description: string) => {
+    return description && description.length > 0;
   };
 }

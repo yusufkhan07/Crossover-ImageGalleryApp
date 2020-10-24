@@ -1,23 +1,52 @@
 <div class="container">
   <h1 class="title">Upload Image</h1>
-  <form (ngSubmit)="handleSubmit()">
-    <app-image-upload [onChange]="handleFileChange"></app-image-upload>
+  <form (ngSubmit)="handleSubmit($event)">
+    <app-image-upload
+      [valid]="file === undefined || validateFile(file)"
+      (fileChange)="handleFileChange($event)"
+    ></app-image-upload>
 
     <div class="field">
       <label class="label">Description</label>
       <div class="control">
         <input
           class="input"
+          [ngClass]="{
+            input: true,
+            'is-success': validateDescription(description),
+            'is-danger':
+              description !== undefined && !validateDescription(description)
+          }"
           type="text"
           name="description"
+          (ngModelChange)="handleDescriptionChange($event)"
           [(ngModel)]="description"
           placeholder=""
         />
       </div>
+      <p
+        class="help is-danger"
+        [ngStyle]="{
+          display:
+            description === undefined || validateDescription(description)
+              ? 'none'
+              : null
+        }"
+      >
+        Description Required
+      </p>
     </div>
 
     <div>
-      <p>{{ status }}</p>
+      <p
+        class="help"
+        [ngClass]="{
+          'is-success': formSubmissionStatus,
+          'is-danger': !formSubmissionStatus
+        }"
+      >
+        {{ formSubmissionStatusText }}
+      </p>
     </div>
 
     <div class="control">
