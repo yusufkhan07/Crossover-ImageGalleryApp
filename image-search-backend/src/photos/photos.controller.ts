@@ -10,7 +10,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { IsString, IsNotEmpty } from 'class-validator';
 
-import { PhotosService } from './photos.service';
+import { PhotoCreatorService } from './photo-creator.service';
 import { PhotoDto } from './dto/photo.dto';
 
 class PostPostDto {
@@ -21,7 +21,7 @@ class PostPostDto {
 
 @Controller('photos')
 export class PhotosController {
-  constructor(private readonly photosService: PhotosService) {}
+  constructor(private readonly photosService: PhotoCreatorService) {}
 
   @Post('')
   @UseInterceptors(FileInterceptor('photo'))

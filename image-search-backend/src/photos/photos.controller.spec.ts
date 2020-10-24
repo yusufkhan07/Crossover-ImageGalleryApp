@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PhotosController } from './photos.controller';
 
-import { PhotosService } from './photos.service';
+import { PhotoCreatorService } from './photo-creator.service';
 import { PhotoDto } from './dto/photo.dto';
 
 describe('PhotosController', () => {
@@ -12,7 +12,7 @@ describe('PhotosController', () => {
       controllers: [PhotosController],
       providers: [
         {
-          provide: PhotosService,
+          provide: PhotoCreatorService,
           useValue: {
             create: () => {
               return new PhotoDto();

@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import * as AWSMock from 'aws-sdk-mock';
 import * as aws from 'aws-sdk';
 
-import { PhotosService, err_messages } from './photos.service';
+import { PhotoCreatorService, err_messages } from './photo-creator.service';
 import { Photo } from './models/photo.model';
 import { NotImplementedException } from '@nestjs/common';
 
@@ -29,8 +29,8 @@ beforeEach(async () => {
   });
 });
 
-describe('PhotosService', () => {
-  let service: PhotosService;
+describe('PhotoCreatorService', () => {
+  let service: PhotoCreatorService;
   let module: TestingModuleBuilder;
 
   beforeEach(async () => {
@@ -72,11 +72,13 @@ describe('PhotosService', () => {
           },
         },
         ConfigService,
-        PhotosService,
+        PhotoCreatorService,
       ],
     });
 
-    service = (await module.compile()).get<PhotosService>(PhotosService);
+    service = (await module.compile()).get<PhotoCreatorService>(
+      PhotoCreatorService,
+    );
   });
 
   it('should be defined', async () => {
@@ -168,7 +170,9 @@ describe('PhotosService', () => {
   });
 
   it('When creating a photo is succesfull, it should exist in db & s3', async () => {
-    const dbPhotosCountStart = await service.count();
+    const dbPhotosCountStart = await sequelize
+      .model(Photo.getTableName() as string)
+      .count();
     const s3ObjectsCount = Object.keys(s3Storage).length;
 
     await service.create({
@@ -179,20 +183,17 @@ describe('PhotosService', () => {
       } as any,
     });
 
-    const dbPhotosCountEnd = await service.count();
+    const dbPhotosCountEnd = await sequelize
+      .model(Photo.getTableName() as string)
+      .count();
 
     expect(dbPhotosCountEnd).toEqual(dbPhotosCountStart + 1);
     expect(Object.keys(s3Storage).length).toEqual(s3ObjectsCount + 1);
   });
-
-  // describe('list', () => {
-  //   it('should return all files from db', async () => {
-  //   });
-  // });
 });
 
 describe('PhotosServiceWithFailingS3', () => {
-  let service: PhotosService;
+  let service: PhotoCreatorService;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -227,12 +228,12 @@ describe('PhotosServiceWithFailingS3', () => {
             return aws;
           },
         },
-        PhotosService,
+        PhotoCreatorService,
         ConfigService,
       ],
     }).compile();
 
-    service = module.get<PhotosService>(PhotosService);
+    service = module.get<PhotoCreatorService>(PhotoCreatorService);
   });
 
   it('When creating a photo and upload to S3 fails, it should throw an exception', async () => {
@@ -248,7 +249,9 @@ describe('PhotosServiceWithFailingS3', () => {
   });
 
   it('When creating a photo and upload to S3 fails, it should not exist in database', async () => {
-    const dbPhotosCountStart = await service.count();
+    const dbPhotosCountStart = await sequelize
+      .model(Photo.getTableName() as string)
+      .count();
 
     await expect(async () => {
       return await service.create({
@@ -260,14 +263,16 @@ describe('PhotosServiceWithFailingS3', () => {
       });
     }).rejects.toThrow(err_messages.s3_upload_error);
 
-    const dbPhotosCountEnd = await service.count();
+    const dbPhotosCountEnd = await sequelize
+      .model(Photo.getTableName() as string)
+      .count();
 
     expect(dbPhotosCountEnd).toEqual(dbPhotosCountStart);
   });
 });
 
-describe('PhotosServiceWithFailingPhotoRepositoryCreateMethod', () => {
-  let service: PhotosService;
+describe('PhotoCreatorServiceWithFailingPhotoRepositoryCreateMethod', () => {
+  let service: PhotoCreatorService;
 
   beforeEach(async () => {
     s3Storage = {};
@@ -311,11 +316,11 @@ describe('PhotosServiceWithFailingPhotoRepositoryCreateMethod', () => {
           },
         },
         ConfigService,
-        PhotosService,
+        PhotoCreatorService,
       ],
     }).compile();
 
-    service = module.get<PhotosService>(PhotosService);
+    service = module.get<PhotoCreatorService>(PhotoCreatorService);
   });
 
   it('when photo insertion in db fails, it should not exist s3', async () => {

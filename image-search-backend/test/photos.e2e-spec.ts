@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 
 import { PhotosModule } from '../src/photos/photos.module';
-import { PhotosService } from '../src/photos/photos.service';
+import { PhotoCreatorService } from '../src/photos/photo-creator.service';
 import { PhotoDto } from '../src/photos/dto/photo.dto';
 import assert = require('assert');
 
@@ -14,7 +14,7 @@ describe('PhotosController (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [PhotosModule],
     })
-      .overrideProvider(PhotosService)
+      .overrideProvider(PhotoCreatorService)
       .useValue({
         create: () => {
           return new PhotoDto();

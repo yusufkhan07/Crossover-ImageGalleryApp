@@ -19,7 +19,7 @@ export const err_messages = {
 };
 
 @Injectable()
-export class PhotosService {
+export class PhotoCreatorService {
   constructor(
     private readonly configService: ConfigService,
     @InjectModel(Photo)
@@ -27,10 +27,6 @@ export class PhotosService {
     @Inject(`aws`)
     private readonly _aws: typeof aws,
   ) {}
-
-  async count() {
-    return this.photoModel.count();
-  }
 
   private async uploadToS3(file: { Key: string; Body: aws.S3.Body }) {
     const s3 = new this._aws.S3();
