@@ -29,10 +29,31 @@ describe('PhotoSearchService', () => {
     expect(service).toBeDefined();
   });
 
-  it(`should return all files`, async () => {
-    await service.list();
+  it(`should return list page 0 with limit 20`, async () => {
+    await service.list(0, 20);
 
-    expect(Photo.findAll).toBeCalledWith();
+    expect(Photo.findAll).toBeCalledWith({
+      limit: 20,
+      offset: 0,
+    });
+  });
+
+  it(`should return list page 1 with limit 20`, async () => {
+    await service.list(1, 20);
+
+    expect(Photo.findAll).toBeCalledWith({
+      limit: 20,
+      offset: 20,
+    });
+  });
+
+  it(`should return list page 5 with limit 10`, async () => {
+    await service.list(5, 10);
+
+    expect(Photo.findAll).toBeCalledWith({
+      limit: 10,
+      offset: 50,
+    });
   });
 
   it(`should search for description`, async () => {

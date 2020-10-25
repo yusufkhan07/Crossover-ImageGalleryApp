@@ -11,8 +11,11 @@ export class PhotoSearchService {
     private readonly photoModel: typeof Photo,
   ) {}
 
-  async list() {
-    return this.photoModel.findAll();
+  async list(curPage: number, limit: number) {
+    return this.photoModel.findAll({
+      limit,
+      offset: curPage * limit,
+    });
   }
 
   async searchByDescription(description: string) {
