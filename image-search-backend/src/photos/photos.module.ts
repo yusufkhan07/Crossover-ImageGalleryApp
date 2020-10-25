@@ -5,6 +5,7 @@ import * as aws from 'aws-sdk';
 
 import { PhotosController } from './photos.controller';
 import { PhotoCreatorService } from './photo-creator.service';
+import { PhotoSearchService } from './photo-search.service';
 import { Photo } from './models/photo.model';
 
 @Module({
@@ -12,6 +13,7 @@ import { Photo } from './models/photo.model';
   controllers: [PhotosController],
   providers: [
     PhotoCreatorService,
+    PhotoSearchService,
     {
       provide: `aws`,
       useFactory: async () => {
