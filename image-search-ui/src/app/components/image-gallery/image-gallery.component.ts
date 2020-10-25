@@ -38,4 +38,8 @@ export class ImageGalleryComponent implements OnInit {
       },
     ];
   }
+
+  onScroll() {
+    console.log('scrolled');
+  }
 }

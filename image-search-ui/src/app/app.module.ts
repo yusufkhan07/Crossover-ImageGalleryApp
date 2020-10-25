@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -10,8 +11,19 @@ import { ImageUploadFormComponent } from './components/image-upload-form/image-u
 import { ImageGalleryComponent } from './components/image-gallery/image-gallery.component';
 
 @NgModule({
-  declarations: [AppComponent, ImageUploadComponent, ImageUploadFormComponent, ImageGalleryComponent],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule],
+  declarations: [
+    AppComponent,
+    ImageUploadComponent,
+    ImageUploadFormComponent,
+    ImageGalleryComponent,
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
+    HttpClientModule,
+    InfiniteScrollModule,
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })

@@ -1,4 +1,10 @@
-<section class="section">
+<section
+  class="section"
+  infiniteScroll
+  [infiniteScrollDistance]="2"
+  [infiniteScrollThrottle]="100"
+  (scrolled)="onScroll()"
+>
   <div class="container">
     <div class="columns is-multiline is-mobile">
       <div *ngFor="let image of images" class="column is-one-quarter">
