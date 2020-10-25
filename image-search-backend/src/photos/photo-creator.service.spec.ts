@@ -1,46 +1,32 @@
-import { Test, TestingModuleBuilder } from '@nestjs/testing';
-import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
+import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { NotImplementedException } from '@nestjs/common';
 import * as AWSMock from 'aws-sdk-mock';
 import * as aws from 'aws-sdk';
 
 import { PhotoCreatorService, err_messages } from './photo-creator.service';
 import { Photo } from './models/photo.model';
-import { NotImplementedException } from '@nestjs/common';
 
-let sequelize: Sequelize;
+jest.mock('./models/photo.model');
+
 let s3Storage: {};
 
 beforeEach(async () => {
-  const testDbConfig: SequelizeOptions = {
-    database: 'some_db',
-    dialect: 'sqlite',
-    username: 'root',
-    password: '',
-    storage: ':memory:',
-    logging: false,
-    models: [Photo],
-  };
-
-  sequelize = new Sequelize(testDbConfig);
-
-  await sequelize.sync({
-    force: true,
-  });
+  jest.resetAllMocks();
 });
 
 describe('PhotoCreatorService', () => {
   let service: PhotoCreatorService;
-  let module: TestingModuleBuilder;
+  let module: TestingModule;
 
   beforeEach(async () => {
     s3Storage = {};
 
-    module = Test.createTestingModule({
+    module = await Test.createTestingModule({
       providers: [
         {
           provide: `PhotoRepository`,
-          useValue: sequelize.model(Photo.getTableName() as string),
+          useValue: Photo,
         },
         {
           provide: `aws`,
@@ -74,11 +60,9 @@ describe('PhotoCreatorService', () => {
         ConfigService,
         PhotoCreatorService,
       ],
-    });
+    }).compile();
 
-    service = (await module.compile()).get<PhotoCreatorService>(
-      PhotoCreatorService,
-    );
+    service = module.get(PhotoCreatorService);
   });
 
   it('should be defined', async () => {
@@ -86,42 +70,23 @@ describe('PhotoCreatorService', () => {
   });
 
   it('When creating a photo and file type is valid, it should have size less than or equal to 500kb', async () => {
-    const created0Kb = await service.create({
+    await service.create({
       description: 'hello',
       file: {
-        size: 0 * 1024,
-        mimetype: 'image/png',
-      } as any,
-    });
-
-    const created250Kb = await service.create({
-      description: 'hello',
-      file: {
+        originalname: 'some-file-name',
+        buffer: [],
         size: 250 * 1024,
         mimetype: 'image/png',
-      } as any,
+      },
     });
 
-    const created499Kb = await service.create({
-      description: 'hello',
-      file: {
-        size: 499 * 1024,
+    expect(Photo.create).toBeCalledWith(
+      expect.objectContaining({
+        description: 'hello',
+        size: 250 * 1024,
         mimetype: 'image/png',
-      } as any,
-    });
-
-    const created500Kb = await service.create({
-      description: 'hello',
-      file: {
-        size: 500 * 1024,
-        mimetype: 'image/png',
-      } as any,
-    });
-
-    expect(created0Kb).toBeInstanceOf(Photo);
-    expect(created250Kb).toBeInstanceOf(Photo);
-    expect(created499Kb).toBeInstanceOf(Photo);
-    expect(created500Kb).toBeInstanceOf(Photo);
+      }),
+    );
   });
 
   it('When creating a photo and file type is valid and file size is greater han 500kb, it should throw a BadRqeuestException', async () => {
@@ -129,32 +94,51 @@ describe('PhotoCreatorService', () => {
       await service.create({
         description: 'hello',
         file: {
+          originalname: 'some-file-name',
+          buffer: [],
           size: 501 * 1024,
           mimetype: 'image/png',
-        } as any,
+        },
       });
     }).rejects.toThrow(err_messages.invalid_file_size);
   });
 
   it('When creating a photo and file size is valid, it should have a type of png or jpeg', async () => {
-    const createdPng = await service.create({
+    await service.create({
       description: 'hello',
       file: {
+        originalname: 'some-file-name',
+        buffer: [],
         size: 1,
         mimetype: 'image/png',
-      } as any,
+      },
     });
 
-    const createdJpeg = await service.create({
+    expect(Photo.create).toBeCalledWith(
+      expect.objectContaining({
+        description: 'hello',
+        size: 1,
+        mimetype: 'image/png',
+      }),
+    );
+
+    await service.create({
       description: 'hello',
       file: {
+        originalname: 'some-file-name',
+        buffer: [],
         size: 2,
-        mimetype: 'image/png',
-      } as any,
+        mimetype: 'image/jpeg',
+      },
     });
 
-    expect(createdPng).toBeInstanceOf(Photo);
-    expect(createdJpeg).toBeInstanceOf(Photo);
+    expect(Photo.create).toBeCalledWith(
+      expect.objectContaining({
+        description: 'hello',
+        size: 2,
+        mimetype: 'image/jpeg',
+      }),
+    );
   });
 
   it('When creating a photo and file size is valid but file type is not png or jpeg, it should throw an exception', async () => {
@@ -162,32 +146,37 @@ describe('PhotoCreatorService', () => {
       await service.create({
         description: 'hello',
         file: {
+          originalname: 'some-file-name',
+          buffer: [],
           size: 1,
           mimetype: 'image/gif',
-        } as any,
+        },
       });
     }).rejects.toThrow(err_messages.invalid_file_type);
   });
 
   it('When creating a photo is succesfull, it should exist in db & s3', async () => {
-    const dbPhotosCountStart = await sequelize
-      .model(Photo.getTableName() as string)
-      .count();
     const s3ObjectsCount = Object.keys(s3Storage).length;
 
     await service.create({
       description: 'hello',
       file: {
+        originalname: 'some-file-name',
+        buffer: [],
         size: 0,
         mimetype: 'image/png',
-      } as any,
+      },
     });
 
-    const dbPhotosCountEnd = await sequelize
-      .model(Photo.getTableName() as string)
-      .count();
+    // photo was created
+    expect(Photo.create).toBeCalledWith(
+      expect.objectContaining({
+        description: 'hello',
+        size: 0,
+        mimetype: 'image/png',
+      }),
+    );
 
-    expect(dbPhotosCountEnd).toEqual(dbPhotosCountStart + 1);
     expect(Object.keys(s3Storage).length).toEqual(s3ObjectsCount + 1);
   });
 });
@@ -200,7 +189,7 @@ describe('PhotosServiceWithFailingS3', () => {
       providers: [
         {
           provide: `PhotoRepository`,
-          useValue: sequelize.model(Photo.getTableName() as string),
+          useValue: Photo,
         },
         {
           provide: `aws`,
@@ -241,33 +230,29 @@ describe('PhotosServiceWithFailingS3', () => {
       return await service.create({
         description: 'hello',
         file: {
+          originalname: 'some-file-name',
+          buffer: [],
           size: 1,
           mimetype: 'image/png',
-        } as any,
+        },
       });
     }).rejects.toThrow(err_messages.s3_upload_error);
   });
 
   it('When creating a photo and upload to S3 fails, it should not exist in database', async () => {
-    const dbPhotosCountStart = await sequelize
-      .model(Photo.getTableName() as string)
-      .count();
-
     await expect(async () => {
       return await service.create({
         description: 'hello',
         file: {
+          originalname: 'some-file-name',
+          buffer: [],
           size: 1,
           mimetype: 'image/png',
-        } as any,
+        },
       });
     }).rejects.toThrow(err_messages.s3_upload_error);
 
-    const dbPhotosCountEnd = await sequelize
-      .model(Photo.getTableName() as string)
-      .count();
-
-    expect(dbPhotosCountEnd).toEqual(dbPhotosCountStart);
+    expect(Photo.destroy).toBeCalled();
   });
 });
 
@@ -330,9 +315,11 @@ describe('PhotoCreatorServiceWithFailingPhotoRepositoryCreateMethod', () => {
       return await service.create({
         description: 'hello',
         file: {
+          originalname: 'some-file-name',
+          buffer: [],
           size: 1,
           mimetype: 'image/png',
-        } as any,
+        },
       });
     }).rejects.toThrow();
 

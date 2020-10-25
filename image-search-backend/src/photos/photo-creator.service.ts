@@ -71,6 +71,8 @@ export class PhotoCreatorService {
     const created = await this.photoModel.create({
       description: photo.description,
       s3Key,
+      size: photo.file.size,
+      mimetype: photo.file.mimetype,
     });
 
     try {
@@ -79,7 +81,11 @@ export class PhotoCreatorService {
         Body: photo.file.buffer,
       });
     } catch (err) {
-      await created.destroy();
+      await this.photoModel.destroy({
+        where: {
+          s3Key,
+        },
+      });
 
       throw new UnprocessableEntityException(err_messages.s3_upload_error);
     }

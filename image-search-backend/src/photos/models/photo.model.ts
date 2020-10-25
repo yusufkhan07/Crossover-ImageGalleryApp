@@ -32,4 +32,12 @@ export class Photo extends Model<Photo> {
   @AllowNull(false)
   @Column
   s3Key: string;
+
+  @AllowNull(false)
+  @Column
+  size: number
+
+  @AllowNull(false)
+  @Column
+  mimetype: string
 }
