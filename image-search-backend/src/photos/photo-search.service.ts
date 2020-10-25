@@ -19,13 +19,19 @@ export class PhotoSearchService {
     });
   }
 
-  async searchByDescription(description: string): Promise<PhotoDto[]> {
+  async searchByDescription(
+    description: string,
+    curPage: number,
+    limit: number,
+  ): Promise<PhotoDto[]> {
     return this.photoModel.findAll({
       where: {
         description: {
           [Op.iLike]: description,
         },
       },
+      limit,
+      offset: curPage * limit,
     });
   }
 }
