@@ -34,4 +34,32 @@ export class PhotoSearchService {
       offset: curPage * limit,
     });
   }
+
+  async searchBySize(
+    size: number,
+    curPage: number,
+    limit: number,
+  ): Promise<PhotoDto[]> {
+    return this.photoModel.findAll({
+      where: {
+        size,
+      },
+      limit,
+      offset: curPage * limit,
+    });
+  }
+
+  async searchByMimetype(
+    mimetype: string,
+    curPage: number,
+    limit: number,
+  ): Promise<PhotoDto[]> {
+    return this.photoModel.findAll({
+      where: {
+        mimetype,
+      },
+      limit,
+      offset: curPage * limit,
+    });
+  }
 }
