@@ -48,6 +48,14 @@ export class PhotosController {
   }
 
   @ApiQuery({
+    name: 'description',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'mimetype',
+    required: false,
+  })
+  @ApiQuery({
     name: 'curPage',
     required: false,
   })
@@ -55,11 +63,17 @@ export class PhotosController {
     name: 'limit',
     required: false,
   })
+  @ApiQuery({
+    name: 'size',
+    required: false,
+  })
   @Get('')
   list(
     @Query('curPage', ParseIntPipe) curPage: number = 0,
     @Query('limit', ParseIntPipe) limit: number = 20,
     @Query('description') description?: string,
+    @Query('mimetype') mimetype?: string,
+    @Query('size') size?: number,
   ) {
     if (description) {
       return this.photoSearchService.searchByDescription(
@@ -67,6 +81,12 @@ export class PhotosController {
         curPage,
         limit,
       );
+    }
+    if (mimetype) {
+      return this.photoSearchService.searchByMimetype(mimetype, curPage, limit);
+    }
+    if (size) {
+      return this.photoSearchService.searchBySize(size, curPage, limit);
     }
     return this.photoSearchService.list(curPage, limit);
   }

@@ -151,5 +151,119 @@ describe('PhotosController', () => {
       );
       expect(controllerResponse).toBe(result);
     });
+
+    it('should return photos with mimetype & default pagination parameters', async () => {
+      const result: PhotoDto[] = [
+        {
+          createdAt: new Date('2012-01-01'),
+          updatedAt: new Date('2012-01-01'),
+          description: 'hello world',
+          id: 1,
+          s3Key: 'random-guid',
+        },
+      ];
+
+      jest
+        .spyOn(photoSearchService, 'searchByMimetype')
+        .mockImplementation(async (...args) => result);
+
+      const controllerResponse = await controller.list(
+        void 0,
+        void 0,
+        void 0,
+        'image/png',
+      );
+
+      expect(photoSearchService.searchByMimetype).toBeCalledWith(
+        'image/png',
+        0,
+        20,
+      );
+      expect(controllerResponse).toBe(result);
+    });
+
+    it('should return photos with mimetype & received pagination parameters', async () => {
+      const result: PhotoDto[] = [
+        {
+          createdAt: new Date('2012-01-01'),
+          updatedAt: new Date('2012-01-01'),
+          description: 'hello world',
+          id: 1,
+          s3Key: 'random-guid',
+        },
+      ];
+
+      jest
+        .spyOn(photoSearchService, 'searchByMimetype')
+        .mockImplementation(async (...args) => result);
+
+      const controllerResponse = await controller.list(
+        13,
+        10,
+        void 0,
+        'image/jpeg',
+      );
+
+      expect(photoSearchService.searchByMimetype).toBeCalledWith(
+        'image/jpeg',
+        13,
+        10,
+      );
+      expect(controllerResponse).toBe(result);
+    });
+
+    it('should return photos with size & default pagination parameters', async () => {
+      const result: PhotoDto[] = [
+        {
+          createdAt: new Date('2012-01-01'),
+          updatedAt: new Date('2012-01-01'),
+          description: 'hello world',
+          id: 1,
+          s3Key: 'random-guid',
+        },
+      ];
+
+      jest
+        .spyOn(photoSearchService, 'searchBySize')
+        .mockImplementation(async (...args) => result);
+
+      const controllerResponse = await controller.list(
+        void 0,
+        void 0,
+        void 0,
+        void 0,
+        1024,
+      );
+
+      expect(photoSearchService.searchBySize).toBeCalledWith(1024, 0, 20);
+      expect(controllerResponse).toBe(result);
+    });
+
+    it('should return photos with size & received pagination parameters', async () => {
+      const result: PhotoDto[] = [
+        {
+          createdAt: new Date('2012-01-01'),
+          updatedAt: new Date('2012-01-01'),
+          description: 'hello world',
+          id: 1,
+          s3Key: 'random-guid',
+        },
+      ];
+
+      jest
+        .spyOn(photoSearchService, 'searchBySize')
+        .mockImplementation(async (...args) => result);
+
+      const controllerResponse = await controller.list(
+        10,
+        20,
+        void 0,
+        void 0,
+        1024,
+      );
+
+      expect(photoSearchService.searchBySize).toBeCalledWith(1024, 10, 20);
+      expect(controllerResponse).toBe(result);
+    });
   });
 });
