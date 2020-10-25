@@ -7,9 +7,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ImageUploadComponent } from './components/image-upload/image-upload.component';
 import { ImageUploadFormComponent } from './components/image-upload-form/image-upload-form.component';
+import { ImageGalleryComponent } from './components/image-gallery/image-gallery.component';
 
 @NgModule({
-  declarations: [AppComponent, ImageUploadComponent, ImageUploadFormComponent],
+  declarations: [AppComponent, ImageUploadComponent, ImageUploadFormComponent, ImageGalleryComponent],
   imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule],
   providers: [],
   bootstrap: [AppComponent],
