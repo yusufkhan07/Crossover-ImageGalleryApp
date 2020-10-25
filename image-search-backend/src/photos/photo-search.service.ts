@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 
 import { Photo } from './models/photo.model';
+import { PhotoDto } from './dto/photo.dto';
 
 @Injectable()
 export class PhotoSearchService {
@@ -11,14 +12,14 @@ export class PhotoSearchService {
     private readonly photoModel: typeof Photo,
   ) {}
 
-  async list(curPage: number, limit: number) {
+  async list(curPage: number, limit: number): Promise<PhotoDto[]> {
     return this.photoModel.findAll({
       limit,
       offset: curPage * limit,
     });
   }
 
-  async searchByDescription(description: string) {
+  async searchByDescription(description: string): Promise<PhotoDto[]> {
     return this.photoModel.findAll({
       where: {
         description: {
