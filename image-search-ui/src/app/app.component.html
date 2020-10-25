@@ -1,3 +1,12 @@
+<nav class="level">
+  <p class="level-item has-text-centered">
+    <a class="link is-info" [routerLink]="['/']">Home</a>
+  </p>
+  <p class="level-item has-text-centered">
+    <a class="link is-info" [routerLink]="['/form']">Form</a>
+  </p>
+</nav>
+
 <section class="hero is-primary">
   <div class="hero-body">
     <div class="container">
@@ -5,7 +14,8 @@
     </div>
   </div>
 </section>
-<section class="section">
+
+<!-- <section class="section">
   <div class="container">
     <div class="columns">
       <div class="column is-half">
@@ -13,5 +23,6 @@
       </div>
     </div>
   </div>
-</section>
+</section> -->
+
 <router-outlet></router-outlet>
