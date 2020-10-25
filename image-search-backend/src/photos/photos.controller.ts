@@ -6,12 +6,17 @@ import {
   Body,
   ValidationPipe,
   BadRequestException,
+  Get,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { IsString, IsNotEmpty } from 'class-validator';
 
 import { PhotoCreatorService } from './photo-creator.service';
+import { PhotoSearchService } from './photo-search.service';
 import { PhotoDto } from './dto/photo.dto';
+import { ApiQuery } from '@nestjs/swagger';
 
 class PostPostDto {
   @IsNotEmpty()
@@ -21,7 +26,10 @@ class PostPostDto {
 
 @Controller('photos')
 export class PhotosController {
-  constructor(private readonly photosService: PhotoCreatorService) {}
+  constructor(
+    private readonly photosService: PhotoCreatorService,
+    private readonly photoSearchService: PhotoSearchService,
+  ) {}
 
   @Post('')
   @UseInterceptors(FileInterceptor('photo'))
@@ -37,5 +45,29 @@ export class PhotosController {
       file,
       description: dto.description,
     } as any);
+  }
+
+  @ApiQuery({
+    name: 'curPage',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+  })
+  @Get('')
+  list(
+    @Query('curPage', ParseIntPipe) curPage: number = 0,
+    @Query('limit', ParseIntPipe) limit: number = 20,
+    @Query('description') description?: string,
+  ) {
+    if (description) {
+      return this.photoSearchService.searchByDescription(
+        description,
+        curPage,
+        limit,
+      );
+    }
+    return this.photoSearchService.list(curPage, limit);
   }
 }
